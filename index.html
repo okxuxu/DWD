@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AMASS Motion Mimic</title>
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+  <video id="camera" autoplay playsinline muted></video>
+  <canvas id="overlay"></canvas>
+
+  <div id="hud">
+    <div id="scorePanel">
+      <div class="label">real time score</div>
+      <div id="secondScore">--</div>
+
+      <div class="label mt">Cumulative accuracy</div>
+      <div id="overallScore">--</div>
+
+      <div class="label mt">Real person probability (cumulative)</div>
+      <div id="realnessScore">--</div>
+
+      <div id="statusText">Loading...</div>
+    </div>
+
+    <div id="avatarPanel">
+      <div id="avatarTitle">AMASS 3D Reference Avatar</div>
+      <div id="avatar3d"></div>
+    </div>
+
+    <div id="testControls">
+      <button id="startTestBtn">Start Test</button>
+    </div>
+  </div>
+
+  <div id="successOverlay" class="hidden">
+  <div class="success-bg-grid"></div>
+  <div class="success-scanline"></div>
+
+  <div class="success-panel">
+    <div class="success-kicker">IDENTITY VERIFICATION COMPLETE</div>
+    <div class="success-title">REAL PERSON CONFIRMED</div>
+
+    <div class="success-metric">
+      <div class="success-label">REAL PERSON PROBABILITY</div>
+      <div id="successProbability" class="success-value">0%</div>
+    </div>
+
+    <div id="successTimeText" class="success-time">
+      You wasted 0.0 seconds proving that you are human.
+    </div>
+
+    <div class="success-sub">
+      Biometric motion pattern accepted by the verification system.
+    </div>
+
+    <button id="restartTestBtn" class="success-btn">RUN AGAIN</button>
+  </div>
+</div>
+  <script type="module" src="./main.js"></script>
+</body>
+</html>
