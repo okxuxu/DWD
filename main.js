@@ -1,5 +1,6 @@
 import { FilesetResolver, PoseLandmarker } from "@mediapipe/tasks-vision";
 import * as THREE from "three";
+
 const successOverlay = document.getElementById("successOverlay");
 const successProbability = document.getElementById("successProbability");
 const successTimeText = document.getElementById("successTimeText");
@@ -28,13 +29,18 @@ let testPassed = false;
 let testStartTimestamp = 0;
 
 const START_DELAY_SEC = 5.0;
-const SCORE_TIME_WINDOW_SEC = 0.6;
-const SCORE_TIME_STEP_SEC = 0.1;
+
+// ===== 核心调参：时间对齐 + 分数平滑 =====
+const SCORE_TIME_WINDOW_SEC = 1.8;      // 参考动作时间容错窗口（前后各1.8秒）
+const SCORE_TIME_STEP_SEC = 0.08;       // 搜索步长更细
+const SCORE_HISTORY_WINDOW_SEC = 4.0;   // 最近4秒滑动窗口
+const MIN_VALID_FRAMES_IN_WINDOW = 8;   // 窗口内最少有效帧数
+
 const VISIBILITY_THRESHOLD = 0.25;
-const SMOOTH_ALPHA = 0.65;
-const DISPLAY_SCORE_MULTIPLIER = 2.8;
-const PASS_THRESHOLD = 70;
-const MIN_TEST_DURATION_SEC = 10;
+const SMOOTH_ALPHA = 0.45;              // 骨架平滑更强，减少抖动
+const DISPLAY_SCORE_MULTIPLIER = 2;   // 展览版放大显示
+const PASS_THRESHOLD = 80;              // 超过70判定通过
+const MIN_TEST_DURATION_SEC = 10;       // 至少10秒后才能通过
 
 const IDX = {
   LEFT_SHOULDER: 11,
@@ -84,6 +90,9 @@ let completedSecondScores = [];
 let currentSecondAvg = 0;
 let cumulativeScore = 0;
 
+let scoreHistory = [];     // [{ t, score }]
+let slidingWindowScore = 0;
+
 let scene, camera3D, renderer;
 let jointMeshes = {};
 let lineGeometry, linePositions, lineSegments;
@@ -91,7 +100,7 @@ let lineGeometry, linePositions, lineSegments;
 function showSuccessOverlay(probabilityValue, elapsedSec) {
   successProbability.textContent = `${Math.round(probabilityValue)}%`;
   successTimeText.textContent =
-    `You wasted ${elapsedSec.toFixed(1)} seconds proving that you are human.`;
+    `You wasted ${elapsedSec.toFixed(1)} seconds in the process of proving that you are human.`;
 
   successOverlay.classList.remove("hidden");
 }
@@ -103,6 +112,19 @@ function hideSuccessOverlay() {
 function average(arr) {
   if (!arr.length) return 0;
   return arr.reduce((a, b) => a + b, 0) / arr.length;
+}
+
+function percentile(arr, p) {
+  if (!arr.length) return 0;
+  const sorted = [...arr].sort((a, b) => a - b);
+  const idx = (sorted.length - 1) * p;
+  const lo = Math.floor(idx);
+  const hi = Math.ceil(idx);
+
+  if (lo === hi) return sorted[lo];
+
+  const t = idx - lo;
+  return sorted[lo] * (1 - t) + sorted[hi] * t;
 }
 
 function midpoint(a, b) {
@@ -305,6 +327,26 @@ function drawUserOverlay(landmarks) {
   }
 }
 
+function updateSlidingWindowScore(frameScore, elapsedSec) {
+  scoreHistory.push({ t: elapsedSec, score: frameScore });
+
+  const minT = elapsedSec - SCORE_HISTORY_WINDOW_SEC;
+  scoreHistory = scoreHistory.filter(item => item.t >= minT);
+
+  if (scoreHistory.length < MIN_VALID_FRAMES_IN_WINDOW) {
+    slidingWindowScore = frameScore;
+    return;
+  }
+
+  const scores = scoreHistory.map(item => item.score);
+
+  // 用“70%分位数 + 均值”混合，避免几帧抖动拉爆整体分数
+  const p70 = percentile(scores, 0.70);
+  const mean = average(scores);
+
+  slidingWindowScore = 0.7 * p70 + 0.3 * mean;
+}
+
 function updateSecondAndCumulativeScore(frameScore, elapsedSec) {
   const sec = Math.floor(elapsedSec);
 
@@ -354,13 +396,15 @@ function handlePassIfNeeded(realnessValue) {
   startTestBtn.textContent = "Start Again";
   testStarted = false;
 }
+
 function refreshScoreUI() {
-  const secondDisplay = Math.min(100, currentSecondAvg * DISPLAY_SCORE_MULTIPLIER);
+  const secondRaw = slidingWindowScore || currentSecondAvg;
 
   const overallRaw = completedSecondScores.length > 0
-    ? cumulativeScore
-    : currentSecondAvg;
+    ? (0.65 * cumulativeScore + 0.35 * secondRaw)
+    : secondRaw;
 
+  const secondDisplay = Math.min(100, secondRaw * DISPLAY_SCORE_MULTIPLIER);
   const overallDisplay = Math.min(100, overallRaw * DISPLAY_SCORE_MULTIPLIER);
 
   secondScoreEl.textContent = `${secondDisplay.toFixed(0)}%`;
@@ -560,6 +604,10 @@ function resetScores() {
   completedSecondScores = [];
   currentSecondAvg = 0;
   cumulativeScore = 0;
+
+  scoreHistory = [];
+  slidingWindowScore = 0;
+
   refreshScoreUI();
 }
 
@@ -629,7 +677,9 @@ async function loop() {
 
         const frameScore = findBestReferenceMatch(smoothedUserSkeleton, elapsedSec);
 
-        updateSecondAndCumulativeScore(frameScore, elapsedSec);
+        updateSlidingWindowScore(frameScore, elapsedSec);
+        updateSecondAndCumulativeScore(slidingWindowScore, elapsedSec);
+
         refreshScoreUI();
         setStatus("Tracking");
       }
@@ -661,9 +711,6 @@ async function init() {
 
     startTestBtn.addEventListener("click", startTest);
     restartTestBtn.addEventListener("click", startTest);
-
-
-    
 
     requestAnimationFrame(loop);
   } catch (err) {
