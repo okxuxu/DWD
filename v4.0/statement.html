@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Statement</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+
+  <style>
+    *{
+      box-sizing:border-box;
+      margin:0;
+      padding:0;
+    }
+
+    html,body{
+      width:100%;
+      height:100%;
+      background:#d9d9d9;
+      overflow:hidden;
+      font-family:'VT323', monospace;
+      color:#111;
+      letter-spacing:0.02em;
+    }
+
+    body{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      position:relative;
+    }
+
+    .page{
+      width:min(92vw, 1100px);
+      height:min(88vh, 680px);
+      background:#dcdcdc;
+      padding:42px 44px 34px 44px;
+      position:relative;
+      box-shadow:
+        inset 0 0 0 2px #111,
+        0 0 0 1px rgba(0,0,0,0.14);
+    }
+
+    .scanline{
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      background:
+        repeating-linear-gradient(
+          to bottom,
+          rgba(0,0,0,0.03) 0px,
+          rgba(0,0,0,0.03) 1px,
+          transparent 1px,
+          transparent 3px
+        );
+      mix-blend-mode:multiply;
+      opacity:0.36;
+    }
+
+    .noise{
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      opacity:0.04;
+      mix-blend-mode:multiply;
+      background-image:
+        radial-gradient(circle at 20% 20%, rgba(0,0,0,0.14) 0 1px, transparent 1px),
+        radial-gradient(circle at 80% 30%, rgba(0,0,0,0.10) 0 1px, transparent 1px),
+        radial-gradient(circle at 60% 80%, rgba(0,0,0,0.08) 0 1px, transparent 1px),
+        radial-gradient(circle at 30% 70%, rgba(0,0,0,0.10) 0 1px, transparent 1px);
+      background-size: 180px 180px, 220px 220px, 260px 260px, 200px 200px;
+    }
+
+    .corner{
+      position:absolute;
+      top:16px;
+      right:18px;
+      font-size:20px;
+      letter-spacing:0.10em;
+      opacity:0.58;
+      text-transform:uppercase;
+    }
+
+    .title{
+      font-size:72px;
+      line-height:1;
+      margin-bottom:28px;
+      text-transform:uppercase;
+    }
+
+    .content{
+      max-width:860px;
+      font-size:28px;
+      line-height:1.1;
+    }
+
+    .section-heading{
+      font-size:34px;
+      margin-bottom:8px;
+    }
+
+    .para{
+      margin-bottom:18px;
+    }
+
+    .content strong{
+      font-weight:400;
+      text-shadow:0 0 0.2px #111;
+    }
+
+    .bullet-line{
+      display:block;
+      padding-left:22px;
+      text-indent:-18px;
+      margin-bottom:4px;
+    }
+
+    .progressWrap{
+      position:absolute;
+      left:44px;
+      bottom:78px;
+      width:240px;
+      height:2px;
+      background:rgba(0,0,0,0.14);
+      overflow:hidden;
+    }
+
+    .progressBar{
+      width:0%;
+      height:100%;
+      background:#111;
+      transition:width 0.08s linear;
+    }
+
+    .footer{
+      position:absolute;
+      left:44px;
+      right:44px;
+      bottom:20px;
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-end;
+      gap:20px;
+    }
+
+    .hint{
+      font-size:24px;
+      color:#222;
+      opacity:0.92;
+      line-height:1.2;
+    }
+
+    .continue{
+      font-size:24px;
+      text-transform:uppercase;
+      letter-spacing:0.06em;
+      border:2px solid #111;
+      padding:8px 18px;
+      background:transparent;
+      cursor:pointer;
+      font-family:'VT323', monospace;
+      transition:all 0.18s ease;
+    }
+
+    .continue:hover{
+      background:#111;
+      color:#dcdcdc;
+    }
+
+    @media (max-width: 900px){
+      .page{
+        padding:28px 24px 28px 24px;
+      }
+
+      .title{
+        font-size:44px;
+        margin-bottom:22px;
+      }
+
+      .content{
+        font-size:20px;
+      }
+
+      .section-heading{
+        font-size:24px;
+      }
+
+      .footer{
+        left:24px;
+        right:24px;
+        bottom:18px;
+        flex-direction:column;
+        align-items:flex-start;
+      }
+
+      .progressWrap{
+        left:24px;
+        bottom:68px;
+        width:180px;
+      }
+
+      .hint,
+      .continue,
+      .corner{
+        font-size:16px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="scanline"></div>
+    <div class="noise"></div>
+    <div class="corner">Human Verification / Notice</div>
+
+    <div class="title">STATEMENT</div>
+
+    <div class="content">
+      <div class="section-heading">Privacy Notice</div>
+
+      <div class="para">
+        This installation uses a <strong>camera</strong> to capture participants¨ movement and gesture information in order to generate interactive effects.
+      </div>
+
+      <div class="para">
+        Please note:
+        <span class="bullet-line">， The system only captures <strong>motion data</strong> (such as body movement or pose).</span>
+        <span class="bullet-line">， No personal identifiable information (such as name, contact details, or identity information) is collected or stored.</span>
+        <span class="bullet-line">， All data is processed and stored only within a local network and will not be uploaded to the internet or third-party servers.</span>
+        <span class="bullet-line">， All data will be <strong>permanently deleted</strong> after the exhibition ends.</span>
+      </div>
+
+      <div class="para">
+        By participating in the interaction, you acknowledge and accept this notice.
+      </div>
+    </div>
+
+    <div class="progressWrap">
+      <div class="progressBar" id="progressBar"></div>
+    </div>
+
+    <div class="footer">
+      <div class="hint">Swipe left or press Enter to continue</div>
+      <button class="continue" id="continueBtn">Continue</button>
+    </div>
+  </div>
+
+  <script src="statement.js"></script>
+</body>
+</html>

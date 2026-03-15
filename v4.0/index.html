@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Human Verification</title>
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="top-bar">
+      <div class="title-wrap">
+        <div class="eyebrow">Human Verification</div>
+        <h1 class="title">Prove to us that you are human</h1>
+        <p class="subtitle">Follow the motion guide.</p>
+      </div>
+
+      <div class="top-actions">
+        <div class="status-panel">
+          <div class="status-label">System</div>
+          <div class="status-value" id="status">Loading...</div>
+        </div>
+
+        <div class="control-inline">
+          <button id="startBtn" class="btn btn-primary">Start Test</button>
+          <button id="resetBtn" class="btn btn-secondary">Reset</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="main-stage">
+      <section class="stage-card">
+        <div class="stage-frame">
+          <video id="video" autoplay playsinline muted></video>
+          <canvas id="overlay"></canvas>
+
+          <div class="hud hud-left">
+            <div class="hud-card">
+              <div class="hud-label">Score</div>
+              <div class="hud-value" id="scoreValue">0.0</div>
+            </div>
+          </div>
+
+          <div class="hud hud-right">
+            <div class="hud-card small">
+              <div class="hud-label">Task</div>
+              <div class="hud-text" id="taskName">Waiting</div>
+            </div>
+            <div class="hud-card small">
+              <div class="hud-label">Mode</div>
+              <div class="hud-text" id="modeValue">Idle</div>
+            </div>
+          </div>
+
+          <div class="guide-overlay">
+            <div class="guide-overlay-title">Motion guide</div>
+            <canvas id="guideCanvas" width="260" height="220"></canvas>
+            <div class="guide-overlay-caption" id="guideCaption">
+              A guide animation will appear here.
+            </div>
+          </div>
+
+          <div class="instruction-banner" id="instructionBanner">
+            Stand where your full body is visible, then press Start Test.
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="result-modal hidden" id="resultModal">
+    <div class="result-backdrop"></div>
+    <div class="result-dialog">
+      <div class="result-title">Verification complete</div>
+      <div class="result-score" id="finalScore">--</div>
+      <div class="result-verdict" id="finalVerdict">HUMAN CONFIRMED</div>
+
+      <div class="result-time-block">
+        <div class="result-time-label">Time used</div>
+        <div class="result-time-value" id="finalTimeBig">--</div>
+      </div>
+
+      <div class="result-stats">
+        <div class="result-stat">
+          <div class="result-stat-label">Accuracy</div>
+          <div class="result-stat-value" id="resultAccuracy">--</div>
+        </div>
+        <div class="result-stat">
+          <div class="result-stat-label">Stability</div>
+          <div class="result-stat-value" id="resultStability">--</div>
+        </div>
+        <div class="result-stat">
+          <div class="result-stat-label">Reaction</div>
+          <div class="result-stat-value" id="resultReaction">--</div>
+        </div>
+      </div>
+
+      <div class="result-text" id="finalTimeText">
+        You spent -- seconds proving that you are human.
+      </div>
+
+      <div class="result-actions">
+        <button id="modalResetBtn" class="btn btn-primary">Run Again</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="./app.js"></script>
+</body>
+</html> 

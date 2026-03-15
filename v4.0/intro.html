@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Prove You Are Human</title>
+
+  <style>
+    *{
+      box-sizing:border-box;
+      margin:0;
+      padding:0;
+    }
+
+    html,body{
+      width:100%;
+      height:100%;
+      overflow:hidden;
+      background:#000;
+      font-family: "Courier New", monospace;
+    }
+
+    body{
+      position:relative;
+    }
+
+    #sceneWrap{
+      position:fixed;
+      inset:0;
+      z-index:1;
+      background:#000;
+    }
+
+    canvas{
+      display:block;
+    }
+
+    #ui{
+      position:fixed;
+      inset:0;
+      z-index:3;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      pointer-events:none;
+    }
+
+    #centerBlock{
+      text-align:center;
+      transform:translateY(-2vh);
+      padding:24px;
+    }
+
+    #title{
+      color:#fff;
+      font-size:clamp(28px, 4vw, 62px);
+      font-weight:700;
+      letter-spacing:0.08em;
+      line-height:1.1;
+      text-shadow:
+        0 0 8px rgba(255,255,255,0.15),
+        0 0 24px rgba(255,255,255,0.08);
+      margin-bottom:18px;
+    }
+
+    #subtitle{
+      color:#25ff5b;
+      font-size:clamp(14px, 1.6vw, 24px);
+      letter-spacing:0.04em;
+      text-shadow:
+        0 0 10px rgba(37,255,91,0.28),
+        0 0 20px rgba(37,255,91,0.15);
+      animation: blink 1.2s infinite ease-in-out;
+    }
+
+    @keyframes blink{
+      0%,100%{ opacity:0.88; }
+      50%{ opacity:0.32; }
+    }
+
+    #camStatus{
+      position:fixed;
+      left:24px;
+      bottom:20px;
+      z-index:4;
+      color:rgba(255,255,255,0.7);
+      font-size:12px;
+      letter-spacing:0.08em;
+      pointer-events:none;
+    }
+
+    #cornerTag{
+      position:fixed;
+      right:24px;
+      top:20px;
+      z-index:4;
+      color:rgba(255,255,255,0.5);
+      font-size:12px;
+      letter-spacing:0.18em;
+      pointer-events:none;
+    }
+
+    #flash{
+      position:fixed;
+      inset:0;
+      z-index:5;
+      pointer-events:none;
+      background:#fff;
+      opacity:0;
+      transition:opacity 0.18s ease;
+    }
+
+    /* 隐藏摄像头视频，只拿来分析 */
+    #webcam{
+      position:fixed;
+      width:1px;
+      height:1px;
+      opacity:0;
+      pointer-events:none;
+    }
+
+    /* 调试用骨骼画布，默认隐藏 */
+    #debugCanvas{
+      position:fixed;
+      right:16px;
+      bottom:16px;
+      width:220px;
+      height:124px;
+      border:1px solid rgba(255,255,255,0.18);
+      background:rgba(255,255,255,0.03);
+      z-index:6;
+      display:none;
+    }
+  </style>
+</head>
+<body>
+  <div id="sceneWrap"></div>
+
+  <div id="ui">
+    <div id="centerBlock">
+      <div id="title">Prove You Are Human</div>
+      <div id="subtitle">Wave your hand right to start</div>
+    </div>
+  </div>
+
+  <div id="camStatus">LOADING CAMERA...</div>
+  <div id="cornerTag">HUMAN CHECK / INTRO</div>
+  <div id="flash"></div>
+
+  <video id="webcam" autoplay playsinline muted></video>
+  <canvas id="debugCanvas"></canvas>
+
+  <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+  <script type="module" src="./intro.js"></script>
+</body>
+</html>
